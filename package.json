@@ -1,0 +1,63 @@
+{
+  "name": "webpacktypewriter",
+  "version": "0.0.0-development",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start",
+    "clean-dist": "rimraf dist",
+    "clean-and-copy": "npm run clean-dist",
+    "prebuild": "npm run  clean-and-copy",
+    "prebuild:prod": "npm run clean-and-copy",
+    "build": "webpack --env.dev",
+    "build:prod": "webpack --env.prod",
+    "validate": "npm-run-all --parallel lint test --serial check-coverage",
+    "watch:test": "npm test -- --auto-watch --no-single-run",
+    "check-coverage": "istanbul check-coverage --statements 25 --branches 25 --lines 25 --functions 25",
+    "lint": "eslint .",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "commit": "git-cz"
+  },
+  "czConfig": {
+    "path": "node_modules/cz-conventional-changelog"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run vaidate"
+    }
+  },
+  "author": "Andy Lui <awlui2014@gmail.com> (https://awlui.github.io/)",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "6.24.1",
+    "babel-loader": "7.0.0",
+    "babel-plugin-__coverage__": "11.0.0",
+    "babel-plugin-istanbul": "4.1.3",
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
+    "chai": "3.5.0",
+    "commitizen": "2.9.6",
+    "css-loader": "0.28.1",
+    "cz-conventional-changelog": "2.0.0",
+    "eslint": "3.19.0",
+    "eslint-loader": "1.7.1",
+    "ghooks": "2.0.0",
+    "istanbul": "0.4.5",
+    "karma": "1.7.0",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "2.1.1",
+    "karma-coverage": "1.1.1",
+    "karma-mocha": "1.3.0",
+    "karma-webpack": "2.0.3",
+    "mocha": "3.3.0",
+    "npm-run-all": "4.0.2",
+    "rimraf": "2.6.1",
+    "semantic-release": "^6.3.6",
+    "style-loader": "0.17.0",
+    "webpack": "2.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awlui/animate-typewriter.git"
+  }
+}
