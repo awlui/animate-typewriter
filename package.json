@@ -23,7 +23,7 @@
   },
   "config": {
     "ghooks": {
-      "pre-commit": "npm run vaidate"
+      "pre-commit": "npm run validate"
     }
   },
   "author": "Andy Lui <awlui2014@gmail.com> (https://awlui.github.io/)",
