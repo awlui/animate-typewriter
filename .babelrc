@@ -3,7 +3,7 @@
 	"env": {
 		"test": {
 			"plugins": [
-				["istanbul", {"ignore": ["*.test.*"]}]
+				["istanbul", {"exclude": ["**/*.test.*", "**/*Shim.js"]}]
 			]
 		}
 	}
