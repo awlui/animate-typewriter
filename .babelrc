@@ -3,7 +3,8 @@
 	"env": {
 		"test": {
 			"plugins": [
-				["istanbul", {"exclude": ["**/*.test.*", "**/*Shim.js"]}]
+				["istanbul", {"exclude": ["**/*.test.*", "**/*Shim.js"]}],
+				["transform-object-assign"]
 			]
 		}
 	}
