@@ -45,6 +45,10 @@ describe('Top level typewriter', () => {
 		let obj = new Typewriter(null);
 		expect(obj).to.be.empty;
 	});
+	it('has transform setting function', () => {
+		let obj = new Typewriter('root', null);
+		expect(obj.transformSettings).to.be.function;
+	});	
 	it('requires options param', () => {
 		let obj = new Typewriter('root', null);
 		expect(obj).to.be.empty;
