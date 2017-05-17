@@ -55,6 +55,10 @@ export default class Typewriter {
 		this._addToEventQueue({action: "Type String", data: string});
 		return this;
 	}
+	changeSettings(settings) {
+		this._addToEventQueue({action: "Change Settings", settings});
+		return this;
+	}
 	deleteCharacters(n) {
 		this._addToEventQueue({action: "Delete String", amount: n});
 		return this;
@@ -97,6 +101,8 @@ export default class Typewriter {
 				case 'Pause':
 					this._pauseFor(workingEvent.duration, cb);
 					break;
+				case "Change Settings":
+					this._transformSettings(workingEvent.settings)
 			}
 		}
 	}
