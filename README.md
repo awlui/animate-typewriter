@@ -8,5 +8,12 @@
 
 ## Documentation
 ### Usage
-You have to instantiate the top level Typewriter Object and pass it parameters, which include the id for the root element that you want to inject the typewriter into. The second parameter will be custom settings that will be merged with the default settings.
-	
+You have to instantiate the top level Typewriter Object and pass it parameters, which include the id for the root element that you want to inject the typewriter into. The second parameter, optional, will be custom settings that will be merged with the default settings.
+	var obj = new Typewriter('rootID', {typingSpeed: 'fast'});
+
+	obj
+	  .typeCharacters('Hello')
+	  .pauseFor(1000)
+	  .deleteCharacters(3)
+	  .typeCharacters('y')
+	  .start();
