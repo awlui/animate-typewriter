@@ -15,7 +15,7 @@ before_script:
   - npm prune
 script:
   - npm run validate
-  - npm run build:prod
+  - npm run build
 after_success:
   - npm run semantic-release
   - npm run report-coverage
