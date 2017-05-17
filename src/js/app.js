@@ -1,6 +1,8 @@
 import './reqAnimShim';
 import uuid from 'node-uuid';
 export default class Typewriter {
+	//Top Level Typewriter object
+	//Takes root element id and optional settings that will be merged with default settings
 	constructor(elId, settings={}) {
 		if (!elId || typeof elId !== 'string') {
 			console.error('Need ID for typewriter insert');
