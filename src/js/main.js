@@ -5,6 +5,7 @@
 
 // obj
 //   .typeCharacters('Andy is cool.')
-//   .moveLeft(5)
-//   .moveRight(6)
+//   .pauseFor(1000)
+//   .moveLeft(100)
+//   .deleteCharacters(5)
 //   .start()

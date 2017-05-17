@@ -11,6 +11,7 @@ export default class Typewriter {
 			return;
 		}
 		this.el = document.getElementById(elId);
+		this.el.outline = 'none';
 		this._htmlWorkingArray = [];
 		this._currentCharIdArray = [];
 		this._eventQueue = [];
@@ -50,6 +51,21 @@ export default class Typewriter {
 		this._addToEventQueue({action: "Type String", data: string});
 		return this;
 	}
+	deleteCharacters(n) {
+		this._addToEventQueue({action: "Delete String", amount: n});
+		return this;
+	}
+	pauseFor(ms) {
+		this._addToEventQueue({action: "Pause", duration: ms});
+		return this;
+	}
+	_pauseFor(ms, cb) {
+		this._eventRunning = true;
+		setTimeout(() => {
+			this._eventRunning = false;
+			this._startEventLoop(cb);
+		}, ms);
+	}
 	pause() {
 		this._settings.cursor.paused = true;
 		this._settings.characters.paused = true;
@@ -68,10 +84,15 @@ export default class Typewriter {
 				case 'Type String':
 					this._typeCharacters(workingEvent.data, cb);
 					break;
+				case 'Delete String':
+					this._deleteCharacters(workingEvent.amount, cb);
+					break;
 				case 'Move Cursor':
 					this._movePointer(workingEvent.steps, workingEvent.direction, cb);
 					break;
-				default:
+				case 'Pause':
+					this._pauseFor(workingEvent.duration, cb);
+					break;
 			}
 		}
 	}
@@ -80,8 +101,8 @@ export default class Typewriter {
 		cursor.innerHTML = this._settings.cursor.text;
 		cursor.className = this._settings.cursor.className;
 		cursor.id = 'cursor-placeholder';
-		cursor.style.width = '10px';
-		cursor.style.backgroundColor = `rgba(0,0,0,${1})`
+		cursor.style.width = '10px !important';
+		cursor.style.backgroundColor = `rgba(0,0,0,${1})`;
 		cursor.style.fontSize = this._settings.fontSize;
 		this.el.appendChild(cursor);
 
@@ -95,6 +116,7 @@ export default class Typewriter {
 			const flash_speed = this._settings.cursor.flashSpeed;
 			const increment_opacity = (1/1000) * flash_speed;
 			const cursor = document.querySelector(`.${this._settings.cursor.className}`) || document.getElementById('cursor-placeholder');
+			cursor.style.fontSize = this._settings.fontSize;
 			if (this._settings.cursor.opacityIncreasing == true) {
 				if (this._settings.cursor.currentOpacity >= 1) {
 					this._settings.cursor.opacityIncreasing = false;
@@ -290,6 +312,62 @@ export default class Typewriter {
 			}, 200)
 		}
 
+	}
+	_deleteCharacters(n, cb) {
+		this._eventRunning = true;
+		if (typeof n === 'number') {
+			this._deleteCharacterAnimationFrame(n, cb);
+		} else if (typeof n === 'string') {
+			if (n === 'delete all') {
+			this._deleteCharacterAnimationFrame(this._currentCharIdArray.length, cb);
+			}
+		}
+	}
+	_deleteCharacterAnimationFrame(n, cb) {
+		let textWrapper = this.el.getElementsByClassName(this._settings.characters.className)[0];
+		let deleteSpeed = this._settings.deleteSpeed;
+		let rate;
+		switch(deleteSpeed) {
+			case 'slow':
+				rate = this._randomWithinRange(150, 250);
+				break;
+			case 'medium':
+				rate = this._randomWithinRange(100, 200);
+				break;
+			case 'fast':
+				rate = this._randomWithinRange(50, 150);
+				break;
+		}
+			setTimeout(() => {
+				if (n <= 0) {
+					this._eventRunning = false;
+					window.cancelAnimationFrame(this.unsubscribeDeleteCharacterAnimation);
+					this._startEventLoop(cb);
+					return;
+				}
+				if (!this._settings.currentPositionId) {
+					if (n <= this._currentCharIdArray.length) {
+						let charToDelete = document.getElementById(this._currentCharIdArray.pop());
+						textWrapper.removeChild(charToDelete);
+						this.unsubscribeDeleteCharacterAnimation = window.requestAnimationFrame(() => {this._deleteCharacterAnimationFrame(n-1, cb)});
+					} else {
+						let max = this._currentCharIdArray.length;
+						this.unsubscribeDeleteCharacterAnimation = window.requestAnimationFrame(() => {this._deleteCharacterAnimationFrame(max, cb)});
+					}
+				} else {
+					if (n <= this._findIndexById(this._settings.currentPositionId)) {
+						let currentIndex = this._findIndexById(this._settings.currentPositionId);
+						let charToDelete = document.getElementById(this._currentCharIdArray[currentIndex-1]);
+						textWrapper.removeChild(charToDelete);
+						this._currentCharIdArray = [...this._currentCharIdArray.slice(0,currentIndex-1), ...this._currentCharIdArray.slice(currentIndex)]
+						this.unsubscribeDeleteCharacterAnimation = window.requestAnimationFrame(() => {this._deleteCharacterAnimationFrame(n-1,cb)});
+					} else {
+						let max = this._findIndexById(this._settings.currentPositionId);
+						this.unsubscribeDeleteCharacterAnimation = window.requestAnimationFrame(() => {this._deleteCharacterAnimationFrame(max,cb)});
+					}
+
+				}
+			}, rate);
 	}
 	_randomWithinRange(min, max) {
 		return (Math.floor(Math.random() * (max-min)) + min);

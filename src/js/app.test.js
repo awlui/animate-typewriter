@@ -2,11 +2,7 @@ import Typewriter from './app';
 import createMockRaf from 'mock-raf';
 let mockRaf = createMockRaf();
 let clock = sinon.useFakeTimers();
-// if (!Object.assign) {
-// Object.assign = function() {
-// 	return;
-// }
-// }
+
 const defaultSettings = {
 			dev: true,
 			fontSize: '50px',
@@ -62,6 +58,16 @@ describe('Top level typewriter', () => {
 		let obj = new Typewriter('root', {});
 		expect(obj._settings).to.not.be.empty;
 	});
+	it('I can pause for a given number of ms', () => {
+		let obj = new Typewriter('root');
+		expect(obj._eventRunning).to.be.false;
+		obj
+		.pauseFor(2000)
+		.start()
+		expect(obj._eventRunning).to.be.true;
+		clock.tick(2000);
+		expect(obj._eventRunning).to.be.false;
+	})
 	it('should have the dom element', () => {
 		let obj = new Typewriter('root', {});
 		expect(obj.el.id).to.be.equal('root');
@@ -281,5 +287,88 @@ describe('Top level typewriter', () => {
 
 
 		});
+	})
+	describe('the delete feature', () => {
+		let obj, root, textWrapper;
+		beforeEach(() => {
+			obj = new Typewriter('root', {});
+			root = document.getElementById('root');
+			textWrapper = root.getElementsByClassName('text-placeholder')[0];
+			obj
+			  .typeCharacters('hello')
+			  .start()
+			frameAndTick(10, 10, 1000);
+		});
+		afterEach(() => {
+			root.innerHTML = "";
+		});
+		it('you can delete characters by specifying a number', () => {
+			expect(textWrapper.childElementCount).to.be.equal(5);
+			obj
+			  .deleteCharacters(2)
+			  .start();
+			frameAndTick(5, 5, 1000);
+			expect(textWrapper.childElementCount).to.be.equal(3);
+ 		});
+ 		it('if you try to delete more than the max allowable, it will just delete the max and not error', () => {
+			expect(textWrapper.childElementCount).to.be.equal(5);
+			obj
+			  .deleteCharacters(100)
+			  .start();
+			frameAndTick(10,10,1000);
+			expect(textWrapper.childElementCount).to.be.equal(0);
+
+ 		});
+ 		it('you can delete characters with "delete all"', () => {
+			expect(textWrapper.childElementCount).to.be.equal(5);
+			obj
+			  .deleteCharacters('delete all')
+			  .start();
+			frameAndTick(5,5,1000);
+			expect(textWrapper.childElementCount).to.be.equal(0);
+ 		});
+ 		it('can change delete speed', () => {
+ 			obj.transformSettings({deleteSpeed: 'fast'});
+
+ 			obj.deleteCharacters('delete all')
+ 			.start();
+
+ 			frameAndTick(5,5,1000);
+ 			expect(textWrapper.childElementCount).to.be.equal(0);
+ 		});
+ 		it('can change delete speed', () => {
+ 			obj.transformSettings({deleteSpeed: 'slow'});
+
+ 			obj.deleteCharacters('delete all')
+ 			.start();
+
+ 			frameAndTick(5,5,1000);
+ 			expect(textWrapper.childElementCount).to.be.equal(0);
+ 		});
+ 		describe('after moving around', () => {
+ 			it('can still delete', () => {
+ 				expect(textWrapper.childElementCount).to.be.equal(5);
+
+ 				obj 
+ 				 .moveLeft(3)
+ 				 .deleteCharacters('delete all')
+ 				 .start()
+
+ 				 frameAndTick(10,5,1000);
+
+ 				 expect(textWrapper.childElementCount).to.be.equal(3);
+ 			});
+ 			it('won\'t delete if on index 0', () => {
+ 				expect(textWrapper.childElementCount).to.be.equal(5);
+
+ 				obj
+ 				  .moveLeft(100)
+ 				  .deleteCharacters(5)
+ 				  .start()
+
+ 				  frameAndTick(10,5,1000);
+ 				  expect(textWrapper.childElementCount).to.be.equal(5);
+ 			})
+ 		});
 	})
 });
