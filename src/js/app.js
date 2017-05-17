@@ -377,3 +377,4 @@ export default class Typewriter {
 	}
 
 }
+module.exports = Typewriter;

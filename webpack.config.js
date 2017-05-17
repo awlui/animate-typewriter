@@ -4,10 +4,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = env => {
   return {
-    entry: './js/main.js',
+    entry: './js/app.js',
     output: {
       filename: 'bundle.js',
-      path: resolve(__dirname, 'dist')
+      path: resolve(__dirname, 'dist'),
+      libraryTarget: 'umd',
+      library: 'Typewriter'
     },
     context: resolve(__dirname, 'src'),
     devtool: env.prod ? 'source-map': 'eval',
