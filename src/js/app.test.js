@@ -58,6 +58,11 @@ describe('Top level typewriter', () => {
 		let obj = new Typewriter('root', {});
 		expect(obj._settings).to.not.be.empty;
 	});
+	it('it can loop if set loop set to true in settings', () => {
+		let obj = new Typewriter('root', {loop: true});
+		obj.typeCharacters('hello').start();
+		frameAndTick(12, 1, 1000);
+	});
 	it('I can pause for a given number of ms', () => {
 		let obj = new Typewriter('root');
 		expect(obj._eventRunning).to.be.false;

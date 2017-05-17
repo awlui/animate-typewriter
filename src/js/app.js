@@ -18,9 +18,11 @@ export default class Typewriter {
 		this._currentCharIdArray = [];
 		this._eventQueue = [];
 		this._eventRunning = false;
+		this._loopQueue = [];
 		//default settings;
 		this._settings = {
 			dev: true,
+			loop: false,
 			fontSize: '50px',
 			fontFamily: '',
 			currentPositionId: null,
@@ -55,10 +57,10 @@ export default class Typewriter {
 		this._addToEventQueue({action: "Type String", data: string});
 		return this;
 	}
-	changeSettings(settings) {
-		this._addToEventQueue({action: "Change Settings", settings});
-		return this;
-	}
+	// changeSettings(settings) {
+	// 	this._addToEventQueue({action: "Change Settings", settings});
+	// 	return this;
+	// }
 	deleteCharacters(n) {
 		this._addToEventQueue({action: "Delete String", amount: n});
 		return this;
@@ -80,10 +82,17 @@ export default class Typewriter {
 	}
 	_addToEventQueue(event) {
 		this._eventQueue.push(event);
+		if (this._settings.loop) {
+			this._loopQueue.push(event);
+		}
 	}
 	_startEventLoop(cb) {
 		if (this._eventQueue.length === 0) {
 			cb();
+			if (this._settings.loop && this._loopQueue.length > 0) {
+				this._eventQueue = this._loopQueue.slice();
+				this._startEventLoop(cb);
+			}
 			return;
 		}
 		while (this._eventQueue.length > 0 && this._eventRunning === false) {
@@ -101,8 +110,8 @@ export default class Typewriter {
 				case 'Pause':
 					this._pauseFor(workingEvent.duration, cb);
 					break;
-				case "Change Settings":
-					this._transformSettings(workingEvent.settings)
+				// case "Change Settings":
+				// 	this._transformSettings(workingEvent.settings)
 			}
 		}
 	}
