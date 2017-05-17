@@ -14,6 +14,7 @@
     "validate": "npm-run-all --parallel lint test --serial check-coverage",
     "watch:test": "npm test -- --auto-watch --no-single-run",
     "check-coverage": "istanbul check-coverage --statements 90 --branches 90 --lines 90 --functions 90",
+    "report-coverage": "cat ./coverage/lcov.info | codecov",
     "lint": "eslint .",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "commit": "git-cz"
@@ -36,6 +37,7 @@
     "babel-preset-stage-2": "6.24.1",
     "chai": "3.5.0",
     "chai-as-promised": "6.0.0",
+    "codecov.io": "0.1.6",
     "commitizen": "2.9.6",
     "css-loader": "0.28.1",
     "cz-conventional-changelog": "2.0.0",
