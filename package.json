@@ -10,7 +10,7 @@
     "prebuild": "npm run  clean-and-copy",
     "prebuild:prod": "npm run clean-and-copy",
     "build": "webpack --env.dev",
-    "build:prod": "webpack --env.prod",
+    "build:prod": "NODE_ENV=production webpack --env.prod -p",
     "validate": "npm-run-all --parallel lint test --serial check-coverage",
     "watch:test": "npm test -- --auto-watch --no-single-run",
     "check-coverage": "istanbul check-coverage --statements 90 --branches 90 --lines 90 --functions 90",

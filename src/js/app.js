@@ -41,6 +41,7 @@ export default class Typewriter {
 			}
 
 		}
+		this.transformSettings(settings);
 		this._insertTypewriterPlaceholder();
 		this._playCursorAnimation();
 	}

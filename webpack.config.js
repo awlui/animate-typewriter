@@ -1,7 +1,8 @@
 const {resolve} = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+let isProd = process.env.NODE_ENV === 'production';
+console.log(isProd)
 module.exports = env => {
   return {
     entry: './js/app.js',
@@ -20,12 +21,12 @@ module.exports = env => {
       ]
     },
   plugins: [
-    new HtmlWebpackPlugin({
+    isProd ? undefined : new HtmlWebpackPlugin({
       template: '../node_modules/html-webpack-template/index.ejs',
       title: 'Typewriter Lib',
       appMountId: 'root',
       inject: false
     })
-  ]
+  ].filter(p => !!p)
   }
 }
