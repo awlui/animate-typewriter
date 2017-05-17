@@ -2,6 +2,11 @@ import Typewriter from './app';
 import createMockRaf from 'mock-raf';
 let mockRaf = createMockRaf();
 let clock = sinon.useFakeTimers();
+if (!Object.assign) {
+Object.assign = function() {
+	return;
+}
+}
 const defaultSettings = {
 			dev: true,
 			fontSize: '50px',
