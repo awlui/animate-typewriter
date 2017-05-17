@@ -48,7 +48,7 @@ describe('Top level typewriter', () => {
 	});
 	it('has transform setting function', () => {
 		let obj = new Typewriter('root', null);
-		expect(obj.transformSettings).to.be.function;
+		expect(obj._transformSettings).to.be.function;
 	});	
 	it('requires options param', () => {
 		let obj = new Typewriter('root', null);
@@ -79,7 +79,7 @@ describe('Top level typewriter', () => {
 	it('i can change settings',() => {
 		let obj = new Typewriter('root');
 		expect(obj._settings.cursor.currentOpacity).to.be.equal(1);
-		obj.transformSettings({cursor: {
+		obj._transformSettings({cursor: {
 			"currentOpacity": 0.5
 		}})
 		expect(obj._settings.cursor.currentOpacity).to.be.equal(0.5);
@@ -152,7 +152,7 @@ describe('Top level typewriter', () => {
 
 			});
 			it('write text out w/ fast settings', (done) => {
-				obj.transformSettings({typingSpeed: 'fast'});
+				obj._transformSettings({typingSpeed: 'fast'});
 				obj
 				  .typeCharacters('and')
 				  .start(() => {
@@ -163,7 +163,7 @@ describe('Top level typewriter', () => {
 
 			});
 			it('write text out w/ slow settings', (done) => {
-				obj.transformSettings({typingSpeed: 'slow'});
+				obj._transformSettings({typingSpeed: 'slow'});
 				obj
 				  .typeCharacters('andy')
 				  .start(() => {
@@ -328,7 +328,7 @@ describe('Top level typewriter', () => {
 			expect(textWrapper.childElementCount).to.be.equal(0);
  		});
  		it('can change delete speed', () => {
- 			obj.transformSettings({deleteSpeed: 'fast'});
+ 			obj._transformSettings({deleteSpeed: 'fast'});
 
  			obj.deleteCharacters('delete all')
  			.start();
@@ -337,7 +337,7 @@ describe('Top level typewriter', () => {
  			expect(textWrapper.childElementCount).to.be.equal(0);
  		});
  		it('can change delete speed', () => {
- 			obj.transformSettings({deleteSpeed: 'slow'});
+ 			obj._transformSettings({deleteSpeed: 'slow'});
 
  			obj.deleteCharacters('delete all')
  			.start();

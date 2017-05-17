@@ -43,7 +43,7 @@ export default class Typewriter {
 			}
 
 		}
-		this.transformSettings(settings);
+		this._transformSettings(settings);
 		this._insertTypewriterPlaceholder();
 		this._playCursorAnimation();
 	}
@@ -377,7 +377,7 @@ export default class Typewriter {
 	_randomWithinRange(min, max) {
 		return (Math.floor(Math.random() * (max-min)) + min);
 	}
-	transformSettings(insertedSetting) {
+	_transformSettings(insertedSetting) {
 		this._settings = Object.assign({}, this._settings, insertedSetting, {cursor: Object.assign({}, this._settings.cursor, insertedSetting.cursor)}, {characters: Object.assign({}, this._settings.characters, insertedSetting.characters)});
 	}
 
