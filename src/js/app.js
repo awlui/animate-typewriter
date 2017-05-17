@@ -17,6 +17,7 @@ export default class Typewriter {
 		this._eventRunning = false;
 		//default settings;
 		this._settings = {
+			dev: true,
 			fontSize: '50px',
 			currentPositionId: null,
 			cursorMoveSpeed: 100,
@@ -27,20 +28,21 @@ export default class Typewriter {
 				opacityIncreasing: false,
 				paused: false,
 				text: '&nbsp;',
-				className: 'cursor-placeholder',
+				className: 'moving-cursor',
 				flashSpeed: 100
 
 			},
 			characters: {
 				className: 'text-placeholder',
-				text: ""
+				text: "",
+				paused: false
 			}
 
 		}
 		this._insertTypewriterPlaceholder();
 		this._playCursorAnimation();
 	}
-	start(cb) {
+	start(cb=(() => {})) {
 		this._startEventLoop(cb);
 		return this;
 	}
@@ -49,23 +51,36 @@ export default class Typewriter {
 		return this;
 	}
 	pause() {
-
+		this._settings.cursor.paused = true;
+		this._settings.characters.paused = true;
 	}
 	_addToEventQueue(event) {
 		this._eventQueue.push(event);
 	}
 	_startEventLoop(cb) {
-		while (this._eventQueue.length > 0) {
+		if (this._eventQueue.length === 0) {
+			cb();
+			return;
+		}
+		while (this._eventQueue.length > 0 && this._eventRunning === false) {
 			let workingEvent = this._eventQueue.shift();
+			if (this._settings.dev) {
+				console.log(workingEvent);
+			}
 			switch (workingEvent.action) {
 				case 'Type String':
+					if (this._settings.dev) {
+						console.log('typing...')
+					}
 					this._typeCharacters(workingEvent.data, cb);
 					break;
-				// case 'Move Cursor':
-				// 	this._movePointer(workingEvent.steps, workingEvent.direction);
-				// 	break;
+				case 'Move Cursor':
+					if (this._settings.dev) {
+						console.log('cursor moving' + workingEvent.direction);
+					}
+					this._movePointer(workingEvent.steps, workingEvent.direction, cb);
+					break;
 				default:
-					break;;
 			}
 		}
 	}
@@ -73,12 +88,14 @@ export default class Typewriter {
 		const cursor = document.createElement('span');
 		cursor.innerHTML = this._settings.cursor.text;
 		cursor.className = this._settings.cursor.className;
+		cursor.id = 'cursor-placeholder';
+		cursor.style.width = '10px';
 		cursor.style.backgroundColor = `rgba(0,0,0,${1})`
 		cursor.style.fontSize = this._settings.fontSize;
 		this.el.appendChild(cursor);
 
 		if (!this._settings.cursor.paused) {
-			this._cursorAnimation = window.requestAnimationFrame(() => this._cursorAnimationFrame());
+			this._unsubscribeCursorAnimation = window.requestAnimationFrame(() => this._cursorAnimationFrame());
 		}
 
 	}
@@ -86,7 +103,7 @@ export default class Typewriter {
 		if (!this._settings.cursor.paused) {
 			const flash_speed = this._settings.cursor.flashSpeed;
 			const increment_opacity = (1/1000) * flash_speed;
-			const cursor = this.el.querySelector(`.${this._settings.cursor.className}`);
+			const cursor = document.querySelector(`.${this._settings.cursor.className}`) || document.getElementById('cursor-placeholder');
 			if (this._settings.cursor.opacityIncreasing == true) {
 				if (this._settings.cursor.currentOpacity >= 1) {
 					this._settings.cursor.opacityIncreasing = false;
@@ -102,7 +119,7 @@ export default class Typewriter {
 				this._settings.cursor.currentOpacity -= increment_opacity;
 			}
 			cursor.style.backgroundColor = `rgba(0,0,0,${this._settings.cursor.currentOpacity})`;
-			this._cursorAnimation = window.requestAnimationFrame(() => {this._cursorAnimationFrame()})
+			this._unsubscribeCursorAnimation = window.requestAnimationFrame(() => {this._cursorAnimationFrame()})
 		}
 	}
 	_insertTypewriterPlaceholder() {
@@ -118,12 +135,9 @@ export default class Typewriter {
 		let textWrapper = this.el.getElementsByClassName(this._settings.characters.className)[0];
 		let rate;
 		if (this._htmlWorkingArray.length === 0) {
-			window.cancelAnimationFrame(() => {this.unsubscribeTypeAnimation()});
+			window.cancelAnimationFrame(this.unsubscribeTypeAnimation);
 			this._eventRunning = false;
-			cb();
-
-			// this._startEventLoop(cb);
-
+			this._startEventLoop(cb);
 			return;
 		}
 		switch(typingSpeed) {
@@ -142,7 +156,7 @@ export default class Typewriter {
 				let currentEl = document.getElementById(this._settings.currentPositionId);
 				setTimeout(() => {
 					let nextLetter = this._htmlWorkingArray.shift();
-					this.el.insertBefore(nextLetter, currentEl);
+					textWrapper.insertBefore(nextLetter, currentEl);
 					this.unsubscribeTypeAnimation = window.requestAnimationFrame(() => {this._typewriterAnimationFrame(cb)});
 
 				}, rate);
@@ -154,6 +168,10 @@ export default class Typewriter {
 				}, rate);
 			}
 
+		} else {
+			window.cancelAnimationFrame(this.unsubscribeTypeAnimation);
+			this._eventRunning = false;
+			this._startEventLoop(cb);
 		}
 	}
 	_typeCharacters(characters, cb) {
@@ -166,16 +184,17 @@ export default class Typewriter {
 		}
 		stringArr.forEach((char) => {
 			let htmlChar = document.createElement('i');
-			htmlChar.innerHTML = char;
+			htmlChar.innerHTML = char === " " ? "&nbsp;" : char;
 			htmlChar.id = this._generateUniqueId();
+			htmlChar.style.fontStyle = 'normal';
 			htmlArr.push(htmlChar);
 			idArr.push(htmlChar.id);
 		});
 		this._htmlWorkingArray = htmlArr;
 
 
-		if (this.currentPositionId) {
-			let currentIndex = this._findIndexById(this.currentPositionId);
+		if (this._settings.currentPositionId) {
+			let currentIndex = this._findIndexById(this._settings.currentPositionId);
 			if (currentIndex > 0) {
 				this._currentCharIdArray = [...this._currentCharIdArray.slice(0, currentIndex), ...idArr, ...this._currentCharIdArray.slice(currentIndex)];
 			} else {
@@ -196,48 +215,91 @@ export default class Typewriter {
 			return this._currentCharIdArray.indexOf(id);
 		}
 	}
-	// moveLeft(n) {
-	// 	this._addToEventQueue({action: "Move Cursor", steps: n, direction: 'left'});
-	// 	return this;
-	// }
-	// moveRight(n) {
-	// 	this._addToEventQueue({action: "Move Cursor", steps: n, direction: 'right'});
-	// 	return this;
-	// }
-	// _movePointer(n, direction) {
-	// 	this._eventRunning = true;
-	// 	this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n, direction)});
-	// }
-	// _moveCursorAnimationFrame(n, direction) {
-	// 	let rate = this._settings.cursorMoveSpeed;
-	// 	let currentIndex;
-	// 	if (n <= 0) {
-	// 		this._eventRunning = false;
-	// 		this._startEventLoop();
-	// 		return;
-	// 	}
-	// 	if (direction === 'left') {
-	// 		setTimeout(() => {
-	// 			if (this._currentCharIdArray <= n) {
-	// 				if (!this.currentPositionId) {
-	// 					this.el.querySelector(`.${this._settings.cursor.className}`).className = "";
-	// 					this.currentPositionId = this._currentCharIdArray[-1];
-	// 					this.el.getElementById(`${this.currentPositionId}`).className = this._settings.cursor.className;
+	moveLeft(n) {
+		this._addToEventQueue({action: "Move Cursor", steps: n, direction: 'left'});
+		return this;
+	}
+	moveRight(n) {
+		this._addToEventQueue({action: "Move Cursor", steps: n, direction: 'right'});
+		return this;
+	}
+	_movePointer(n, direction, cb) {
+		this._eventRunning = true;
+		this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n, direction, cb)});
+	}
+	_moveCursorAnimationFrame(n, direction, cb) {
+		let rate = this._settings.cursorMoveSpeed;
+		let currentIndex;
+		if (n <= 0) {
+			this._eventRunning = false;
+			this._startEventLoop(cb);
+			return;
+		}
+		if (direction === 'left') {
+			setTimeout(() => {
+				if (!this._settings.currentPositionId) {
+					if (this._currentCharIdArray.length >= n) {
+							document.querySelector(`.${this._settings.cursor.className}`).style.backgroundColor = `rgba(0,0,0,0)`;
+							this.el.querySelector(`.${this._settings.cursor.className}`).className = "";
+							this._settings.currentPositionId = this._currentCharIdArray[this._currentCharIdArray.length-1];
+							document.getElementById(`${this._settings.currentPositionId}`).className = this._settings.cursor.className;
+							document.getElementById(`${this._settings.currentPositionId}`).className = this._settings.cursor.className;
+							
+
 						
-	// 				} else {
-	// 					this.el.querySelector(`.${this._settings.cursor.className}`).className = "";
-	// 					currentIndex = this._currentCharIdArray.indexOf(this.currentPositionId);
-	// 					currentIndex -= 1;
-	// 					this.currentPositionId = this._currentCharIdArray[currentIndex];
-	// 					this.el.getElementById(`${this.currentPositionId}`).className = this._settings.cursor.className;
+						this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n-1, 'left', cb)});
+					} else {
+						let maxedOut = this._currentCharIdArray.length;
+						this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(maxedOut, 'left', cb)});
+					}
+				} else {
+					let currentIndex = this._findIndexById(this._settings.currentPositionId);
+					if (currentIndex >= n) {
+						document.querySelector(`.${this._settings.cursor.className}`).style.backgroundColor = `rgba(0,0,0,0)`;
+						document.querySelector(`.${this._settings.cursor.className}`).className = "";
+						currentIndex = this._currentCharIdArray.indexOf(this._settings.currentPositionId);
+						currentIndex -= 1;
+						this._settings.currentPositionId = this._currentCharIdArray[currentIndex];
+						document.getElementById(`${this._settings.currentPositionId}`).className = this._settings.cursor.className;
+						this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n-1, 'left', cb)});
+					} else {
+						let maxedOut = currentIndex;
+						this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(maxedOut, 'left', cb)});
+					}
+				}
+			}, 200);
+		}
+		if (direction === 'right') {
+			setTimeout(() => {
+				if (!this._settings.currentPositionId) {
+					document.getElementById('cursor-placeholder').className = this._settings.cursor.className;
+					this._eventRunning = false;
+					this._startEventLoop(cb);
+					return;
+				} else {
+					let totalCount = this._currentCharIdArray.length;
+					let currentIndex = this._findIndexById(this._settings.currentPositionId);
+					let diff = totalCount - currentIndex;
+					if (n <= diff) {
+						document.querySelector(`.${this._settings.cursor.className}`).style.backgroundColor = `rgba(0,0,0,0)`;
+						document.querySelector(`.${this._settings.cursor.className}`).className = "";
+						currentIndex = this._currentCharIdArray.indexOf(this._settings.currentPositionId);
+						currentIndex += 1;
+						this._settings.currentPositionId = (typeof this._currentCharIdArray[currentIndex] === 'undefined') ? null : this._currentCharIdArray[currentIndex];
+						if (this._currentCharIdArray[currentIndex]) {
+							document.getElementById(`${this._settings.currentPositionId}`).className = this._settings.cursor.className;
+							this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n-1, 'right', cb)});
+						} else {
+							this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n, 'right', cb)});
+						}
+					} else {
+						this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(diff, 'right', cb)});
+					}
+				}
+			}, 200)
+		}
 
-	// 				}
-	// 			}
-	// 			this.unsubscribeMoveCursorAnimation = window.requestAnimationFrame(() => {this._moveCursorAnimationFrame(n-1, 'left')});
-	// 		}, rate);
-	// 	}
-
-	// }
+	}
 	_randomWithinRange(min, max) {
 		return (Math.floor(Math.random() * (max-min)) + min);
 	}
