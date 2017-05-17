@@ -20,6 +20,7 @@ export default class Typewriter {
 		this._settings = {
 			dev: true,
 			fontSize: '50px',
+			fontFamily: '',
 			currentPositionId: null,
 			cursorMoveSpeed: 100,
 			typingSpeed: 'medium',
@@ -140,6 +141,7 @@ export default class Typewriter {
 		characters.innerHTML = this._settings.characters.text;
 		characters.className = this._settings.characters.className;
 		characters.style.fontSize = this._settings.fontSize;
+		characters.style.fontFamily = this._settings.fontFamily;
 		this.el.appendChild(characters);
 	}
 
