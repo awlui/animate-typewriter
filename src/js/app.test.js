@@ -2,6 +2,29 @@ import Typewriter from './app';
 import createMockRaf from 'mock-raf';
 let mockRaf = createMockRaf();
 let clock = sinon.useFakeTimers();
+const defaultSettings = {
+			dev: true,
+			fontSize: '50px',
+			currentPositionId: null,
+			cursorMoveSpeed: 100,
+			typingSpeed: 'medium',
+			deleteSpeed: 'medium',
+			cursor: {
+				currentOpacity: 1,
+				opacityIncreasing: false,
+				paused: false,
+				text: '&nbsp;',
+				className: 'moving-cursor',
+				flashSpeed: 100
+
+			},
+			characters: {
+				className: 'text-placeholder',
+				text: "",
+				paused: false
+			}
+
+		};
 sinon.stub(window, 'requestAnimationFrame', mockRaf.raf);
 
 function frameAndTick(loops, frames, ticks) {
@@ -33,6 +56,18 @@ describe('Top level typewriter', () => {
 	it('should have the dom element', () => {
 		let obj = new Typewriter('root', {});
 		expect(obj.el.id).to.be.equal('root');
+	});
+	it('index to id should return undefined when giving nothing',() => {
+		let obj = new Typewriter('root');
+		expect(obj._findIndexById()).to.be.falsy;
+	});
+	it('i can change settings',() => {
+		let obj = new Typewriter('root');
+		expect(obj._settings.cursor.currentOpacity).to.be.equal(1);
+		obj.transformSettings({cursor: {
+			"currentOpacity": 0.5
+		}})
+		expect(obj._settings.cursor.currentOpacity).to.be.equal(0.5);
 	});
 	describe('Typewriter cursor', () => {
 		it('_settings object will have _cursor object', () => {
@@ -66,6 +101,16 @@ describe('Top level typewriter', () => {
 			obj.pause();
 			obj
 			  .typeCharacters('an')
+			  .start(() => {
+			  	expect(textWrapper.childElementCount).to.be.equal(0);
+			  	done();
+			  });
+			  frameAndTick(3, 1, 1000);		
+		});
+		it('should not print without input', (done) => {
+			obj.pause();
+			obj
+			  .typeCharacters()
 			  .start(() => {
 			  	expect(textWrapper.childElementCount).to.be.equal(0);
 			  	done();

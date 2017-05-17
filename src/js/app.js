@@ -64,20 +64,11 @@ export default class Typewriter {
 		}
 		while (this._eventQueue.length > 0 && this._eventRunning === false) {
 			let workingEvent = this._eventQueue.shift();
-			if (this._settings.dev) {
-				console.log(workingEvent);
-			}
 			switch (workingEvent.action) {
 				case 'Type String':
-					if (this._settings.dev) {
-						console.log('typing...')
-					}
 					this._typeCharacters(workingEvent.data, cb);
 					break;
 				case 'Move Cursor':
-					if (this._settings.dev) {
-						console.log('cursor moving' + workingEvent.direction);
-					}
 					this._movePointer(workingEvent.steps, workingEvent.direction, cb);
 					break;
 				default:
@@ -304,7 +295,7 @@ export default class Typewriter {
 		return (Math.floor(Math.random() * (max-min)) + min);
 	}
 	transformSettings(insertedSetting) {
-		this._settings = Object.assign({}, ...this._settings, {cursor: this._settings.cursor}, {characters: this._settings.characters}, insertedSetting);
+		this._settings = Object.assign({}, this._settings, insertedSetting, {cursor: Object.assign({}, this._settings.cursor, insertedSetting.cursor)}, {characters: Object.assign({}, this._settings.characters, insertedSetting.characters)});
 	}
 
 }
