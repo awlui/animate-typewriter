@@ -17,3 +17,6 @@ You have to instantiate the top level Typewriter Object and pass it parameters, 
 	  .deleteCharacters(3)
 	  .typeCharacters('y')
 	  .start();
+
+[DEMO](https://awlui.github.io/projects/typewriterLib/)
+[NPM](https://www.npmjs.com/package/webpacktypewriter)
