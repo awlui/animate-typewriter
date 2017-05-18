@@ -18,5 +18,5 @@ You have to instantiate the top level Typewriter Object and pass it parameters, 
 	  .typeCharacters('y')
 	  .start();
 
-[DEMO](https://awlui.github.io/projects/typewriterLib/)
+[DEMO](https://awlui.github.io/projects/typewriter/)
 [NPM](https://www.npmjs.com/package/webpacktypewriter)
