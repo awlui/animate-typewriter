@@ -1,13 +1,19 @@
 const {resolve} = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const pkg = require('./package.json');
 let isProd = process.env.NODE_ENV === 'production';
 console.log(isProd)
+console.log(pkg.dependencies);
 module.exports = env => {
   return {
-    entry: './js/app.js',
+    entry: {
+
+      app: './js/app.js',
+      vendor: 'node-uuid'
+    },
     output: {
-      filename: 'bundle.js',
+      filename: '[name].[hash].js',
       path: resolve(__dirname, 'dist'),
       libraryTarget: 'umd',
       library: 'Typewriter'
@@ -26,7 +32,9 @@ module.exports = env => {
       title: 'Typewriter Lib',
       appMountId: 'root',
       inject: false
-    })
+    }), isProd ? new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor'
+    }) : undefined
   ].filter(p => !!p)
   }
 }
