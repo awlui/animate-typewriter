@@ -13,7 +13,7 @@ module.exports = env => {
       vendor: 'node-uuid'
     },
     output: {
-      filename: '[name].[hash].js',
+      filename: '[name].[chunkhash].js',
       path: resolve(__dirname, 'dist'),
       libraryTarget: 'umd',
       library: 'Typewriter'
