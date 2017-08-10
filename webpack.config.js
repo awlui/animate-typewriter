@@ -10,13 +10,15 @@ module.exports = env => {
     entry: {
 
       app: './js/app.js',
-      vendor: 'node-uuid'
     },
     output: {
       filename: '[name].[chunkhash].js',
       path: resolve(__dirname, 'dist'),
       libraryTarget: 'umd',
       library: 'Typewriter'
+    },
+    externals: {
+      'node-uuid': 'node-uuid'
     },
     context: resolve(__dirname, 'src'),
     devtool: env.prod ? 'source-map': 'eval',
@@ -32,9 +34,7 @@ module.exports = env => {
       title: 'Typewriter Lib',
       appMountId: 'root',
       inject: false
-    }), isProd ? new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor'
-    }) : undefined
+    })
   ].filter(p => !!p)
   }
 }
