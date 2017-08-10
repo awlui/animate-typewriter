@@ -18,7 +18,7 @@ module.exports = env => {
       library: 'Typewriter'
     },
     externals: {
-      'node-uuid': 'node-uuid'
+      'node-uuid': 'uuid'
     },
     context: resolve(__dirname, 'src'),
     devtool: env.prod ? 'source-map': 'eval',
