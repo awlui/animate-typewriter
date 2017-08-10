@@ -1,5 +1,5 @@
 import './reqAnimShim';
-import uuid from 'node-uuid';
+var uuid = require('node-uuid');
 export default class Typewriter {
 	//Top Level Typewriter object
 	//Takes root element id and optional settings that will be merged with default settings
