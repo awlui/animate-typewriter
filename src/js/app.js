@@ -12,6 +12,9 @@ export default class Typewriter {
 			console.error('Need an object with settings');
 			return;
 		}
+		this.noOp = function() {
+
+		};
 		this.el = document.getElementById(elId);
 		this.el.outline = 'none';
 		this._htmlWorkingArray = [];

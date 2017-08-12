@@ -10,7 +10,7 @@ module.exports = env => {
       app: './js/app.js',
     },
     output: {
-      filename: '[name].[chunkhash].js',
+      filename: 'bundle.js',
       path: resolve(__dirname, 'dist'),
       libraryTarget: 'umd',
       library: 'Typewriter'
