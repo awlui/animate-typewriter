@@ -17,7 +17,8 @@
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "lint": "eslint .",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "stats": "webpack --env.dev --profile --json > stats.json"
   },
   "czConfig": {
     "path": "node_modules/cz-conventional-changelog"
@@ -75,6 +76,7 @@
     "README.md"
   ],
   "dependencies": {
-    "node-uuid": "1.4.8"
+    "node-uuid": "1.4.8",
+    "uuid": "3.1.0"
   }
 }
