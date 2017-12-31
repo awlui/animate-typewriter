@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+		<style>
+	code {
+		outline: none;
+	}
+    pre {
+        font-family: "Courier 10 Pitch", Courier, monospace;
+        font-size: 95%;
+        line-height: 140%;
+        white-space: pre;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+        background: #faf8f0;
+        outline: none;
+        text-align: left;
+    }       
+    
+    
+    #content code {
+        display: block;
+        padding: 0.5em 1em;
+        border: 1px solid #bebab0;
+    }
+			.wrapper {
+				text-align: center;
+			}
+			div .code {
+				width: 50%;
+			}
+			#root {
+				text-align: center;
+			}
+		table {
+			text-align: center;
+			outline: none;
+		}
+		td:nth-of-type(2) {
+			padding-left: 50px;
+		}
+		.apiInfo {
+			display: block;
+			margin: 0 auto;
+			width: 80%;
+
+		}
+		.apiInfo tbody {
+			margin: 0 auto;		}
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<div>
+				<p>Just a basic typewriter animation that you can drop into your web page. The specific actions you want to take are communicated via chainable api.</p>
+				<div id="root"></div>
+				<pre><code class="code"> 
+			var obj = new Typewriter('root', {"fontFamily": "'Arimo', sans-serif", loop: true});
+			</code>
+			<code>
+			obj
+			  .typeCharacters('Hella')
+			  .deleteCharacters(1)
+			  .typeCharacters('o, my name i Andy.')
+			  .moveLeft(6)
+			  .typeCharacters('s')
+			  .moveRight(6)
+			  .pauseFor(2000)
+			  .deleteCharacters('delete all')
+			  .start();
+			</code>
+			</pre>
+			</div>
+			<table class="apiInfo">
+				<tr>
+					<th>Method</th>
+					<th>Use Case</th>
+				</tr>
+				<tr>
+					<td>start()</td>
+					<td>Place at the end of chain to trigger animation.</td>
+				</tr>
+				<tr>
+					<td>typeCharacters(string)</td>
+					<td>Place string as argument in this method for typewriter content</td>
+				</tr>
+				<tr>
+					<td>deleteCharacters(number|string)</td>
+					<td>Place number or string('delete all') to delete that number of characters. If you use number over that which is available, it will simply remove the max number of characters</td>
+				</tr>
+				<tr>
+					<td>moveLeft(number)</td>
+					<td>move cursor n number of spaces to the left</td>
+				</tr>
+				<tr>
+					<td>moveRight(number)</td>
+					<td>move cursor n number of spaces to the right</td>
+				</tr>
+				<tr>
+					<td>pauseFor(ms)</td>
+					<td>Pause next animation till certain time in milliseconds</td>
+				</tr>
+			</table>
+			<div>
+				<h2>Developer's Notes</h2>
+				<p>At the moment you can't inject more than one typewriters into the page. The cursor animation doesn't seem to play when there are more than one in the page. The problem must involve the requestanimationframe api that I use. I will look into it soon.</p>
+			</div>
+		</div>
+		<script src="./bundle.js"></script>
+		<script>
+			var obj = new Typewriter('root', {"fontFamily": "'Arimo', sans-serif", loop: true});
+			obj
+			  .typeCharacters('Hella')
+			  .deleteCharacters(1)
+			  .typeCharacters('o, my name i Andy.')
+			  .moveLeft(6)
+			  .typeCharacters('s')
+			  .moveRight(6)
+			  .pauseFor(2000)
+			  .deleteCharacters('delete all')
+			  .start();
+
+		</script>
+	</body>
+</html>
